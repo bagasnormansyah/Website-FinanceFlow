@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Digital Finance — Kelola Keuangan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#EAF2ED;
+  --surface:rgba(255,255,255,0.62);
+  --surface-alt:rgba(238,245,240,0.65);
+  --green-900:#0F2E42;
+  --green-800:#14425C;
+  --green-700:#1B5C82;
+  --green-600:#2477A6;
+  --green-500:#3C93C2;
+  --green-100:#DCEAF4;
+  --green-050:rgba(238,246,251,0.7);
+  --text:#132530;
+  --text-muted:#5B6E78;
+  --text-faint:#89A0AB;
+  --border:rgba(27,92,130,0.14);
+  --red-600:#B3453B;
+  --red-100:rgba(246,228,225,0.7);
+  --shadow-sm:0 1px 2px rgba(15,46,66,0.06);
+  --shadow-md:0 6px 20px rgba(15,46,66,0.08);
+  --shadow-lg:0 20px 40px rgba(15,46,66,0.14);
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:22px;
+  --ff-display:'Space Grotesk', sans-serif;
+  --ff-body:'Inter', sans-serif;
+  --glass-blur:18px;
+}
+
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--ff-body);
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+  position:relative;
+}
+/* soft color blobs behind the glass UI so transparency reads clearly */
+body::before, body::after{
+  content:"";
+  position:fixed;
+  border-radius:50%;
+  filter:blur(70px);
+  z-index:0;
+  pointer-events:none;
+}
+body::before{
+  width:520px;height:520px;
+  top:-160px; left:-140px;
+  background:radial-gradient(circle, rgba(60,147,194,0.42), transparent 70%);
+}
+body::after{
+  width:480px;height:480px;
+  bottom:-180px; right:-120px;
+  background:radial-gradient(circle, rgba(20,66,92,0.32), transparent 70%);
+}
+.app{position:relative;z-index:1;}
+button{font-family:inherit;}
+input,select,textarea{font-family:inherit;}
+::selection{background:var(--green-100);}
+a{color:inherit;}
+
+/* focus visibility */
+button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible{
+  outline:2px solid var(--green-600);
+  outline-offset:2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+}
+
+.icon{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;display:block;}
+
+/* ============ APP SHELL ============ */
+.app{
+  display:grid;
+  grid-template-columns:248px 1fr;
+  min-height:100vh;
+}
+
+/* ---- Sidebar (desktop) ---- */
+.sidebar{
+  background:rgba(15,46,66,0.72);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  border-right:1px solid rgba(255,255,255,0.08);
+  color:#E7EFF6;
+  padding:26px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:0 6px;
+}
+.brand-mark{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(155deg,var(--green-500),var(--green-700));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--ff-display);font-weight:700;font-size:13px;letter-spacing:0.3px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+.brand-name{font-family:var(--ff-display);font-weight:600;font-size:18px;letter-spacing:0.2px;}
+.brand-sub{font-size:11px;color:#9DB6C9;margin-top:1px;}
+
+.nav{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:11px 12px;
+  border-radius:12px;
+  background:transparent;border:none;color:#BBD1E0;
+  font-size:14.5px;font-weight:500;
+  cursor:pointer;text-align:left;width:100%;
+  transition:background .15s ease, color .15s ease;
+}
+.nav-item .icon{opacity:0.85;}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;}
+.nav-item.active .icon{opacity:1;color:var(--green-500);}
+
+.sidebar-footer{
+  margin-top:auto;
+  padding:14px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.05);
+  font-size:12px;color:#9DB6C9;
+  line-height:1.5;
+}
+.sidebar-footer strong{color:#E7EFF6;display:block;font-family:var(--ff-display);font-size:13px;margin-bottom:2px;}
+
+/* ---- Main ---- */
+.main{
+  min-width:0;
+  padding:28px 34px 100px;
+}
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;margin-bottom:26px;flex-wrap:wrap;
+}
+.topbar h1{
+  font-family:var(--ff-display);font-size:26px;margin:0;letter-spacing:-0.2px;
+}
+.topbar p{margin:4px 0 0;color:var(--text-muted);font-size:13.5px;}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 16px;border-radius:12px;border:1px solid transparent;
+  font-size:14px;font-weight:600;cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--green-700);color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{background:var(--green-800);}
+.btn-soft{background:var(--green-050);color:var(--green-800);}
+.btn-soft:hover{background:var(--green-100);}
+.btn-ghost{background:transparent;color:var(--text-muted);border-color:var(--border);}
+.btn-ghost:hover{background:var(--surface-alt);}
+.btn-danger{background:var(--red-100);color:var(--red-600);}
+.btn-danger:hover{background:#f0d2ce;}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:10px;}
+.btn-icon{padding:9px;border-radius:10px;}
+
+/* ---- Views ---- */
+.view{display:none;}
+.view.active{display:block;animation:fadeIn .25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* ---- Hero balance ---- */
+.hero{
+  background:linear-gradient(135deg, rgba(20,66,92,0.85), rgba(15,46,66,0.88) 70%);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--radius-lg);
+  padding:28px 30px;
+  color:#fff;
+  position:relative;
+  overflow:hidden;
+  margin-bottom:20px;
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;
+  border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%);
+}
+.hero-label{font-size:12.5px;color:#A7C4D8;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;}
+.hero-amount{
+  font-family:var(--ff-display);font-weight:700;
+  font-size:clamp(30px,5vw,44px);
+  margin:6px 0 18px;
+  letter-spacing:-0.5px;
+}
+.hero-row{display:flex;gap:28px;flex-wrap:wrap;position:relative;z-index:1;}
+.hero-stat{display:flex;align-items:center;gap:10px;}
+.hero-stat .dot{width:9px;height:9px;border-radius:50%;}
+.hero-stat .dot.in{background:#7FC4E8;}
+.hero-stat .dot.out{background:#F0938A;}
+.hero-stat-label{font-size:11.5px;color:#A7C4D8;}
+.hero-stat-val{font-family:var(--ff-display);font-weight:600;font-size:16.5px;}
+
+/* ---- Grid cards ---- */
+.grid-2{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:start;}
+.card{
+  background:var(--surface);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:20px 22px;
+  box-shadow:var(--shadow-sm);
+}
+.card-title{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.card-title h3{font-family:var(--ff-display);font-size:15.5px;margin:0;font-weight:600;}
+.card-title .muted-link{font-size:12.5px;color:var(--green-700);font-weight:600;cursor:pointer;background:none;border:none;padding:0;}
+
+/* Accounts grid */
+.accounts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.acc-card{
+  border:1px solid var(--border);border-radius:var(--radius-md);
+  padding:16px 18px;background:var(--surface);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  cursor:pointer;transition:box-shadow .15s ease, border-color .15s ease;
+  position:relative;
+}
+.acc-card:hover{box-shadow:var(--shadow-sm);border-color:var(--green-100);}
+.acc-chip{
+  width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-family:var(--ff-display);font-weight:700;font-size:13px;margin-bottom:12px;
+}
+.acc-name{font-weight:600;font-size:14px;}
+.acc-bank{font-size:12px;color:var(--text-muted);margin-top:1px;}
+.acc-balance{font-family:var(--ff-display);font-weight:700;font-size:19px;margin-top:12px;}
+.acc-balance.neg{color:var(--red-600);}
+
+/* Empty state */
+.empty{
+  text-align:center;padding:40px 20px;color:var(--text-muted);
+}
+.empty .icon{width:34px;height:34px;margin:0 auto 10px;color:var(--text-faint);}
+.empty h4{margin:0 0 4px;font-family:var(--ff-display);color:var(--text);font-size:15px;}
+.empty p{margin:0;font-size:13px;}
+
+/* Transaction list */
+.tx-list{display:flex;flex-direction:column;}
+.tx-row{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 0;border-bottom:1px solid var(--border);
+}
+.tx-row:last-child{border-bottom:none;}
+.tx-ico{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.tx-ico.income{background:var(--green-050);color:var(--green-700);}
+.tx-ico.expense{background:var(--red-100);color:var(--red-600);}
+.tx-ico.transfer{background:#EFEAF9;color:#6A55A6;}
+.tx-mid{flex:1;min-width:0;}
+.tx-title{font-weight:600;font-size:14px;}
+.tx-sub{font-size:12px;color:var(--text-muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tx-amt{font-family:var(--ff-display);font-weight:700;font-size:14.5px;white-space:nowrap;}
+.tx-amt.pos{color:var(--green-700);}
+.tx-amt.neg{color:var(--red-600);}
+.tx-actions{display:flex;gap:4px;margin-left:6px;}
+.tx-actions button{
+  border:none;background:transparent;color:var(--text-faint);cursor:pointer;
+  padding:6px;border-radius:8px;
+}
+.tx-actions button:hover{background:var(--surface-alt);color:var(--text);}
+
+/* Filters bar */
+.filters{
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;
+}
+.filters select, .filters input[type=text], .filters input[type=month]{
+  padding:9px 12px;border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.6);
+  backdrop-filter:blur(8px);
+  font-size:13px;color:var(--text);
+}
+.filters .search-wrap{position:relative;flex:1;min-width:180px;}
+.filters .search-wrap .icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-faint);}
+.filters .search-wrap input{width:100%;padding-left:34px;}
+
+/* Chart */
+.chart-wrap{position:relative;height:210px;}
+
+/* ---- Forms / Modal ---- */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(15,35,48,0.35);
+  display:none;align-items:flex-end;justify-content:center;
+  z-index:100;backdrop-filter:blur(4px);
+}
+.modal-overlay.active{display:flex;}
+.modal{
+  background:rgba(255,255,255,0.78);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  border:1px solid rgba(255,255,255,0.5);
+  border-radius:22px 22px 0 0;
+  width:100%;max-width:460px;
+  max-height:92vh;overflow-y:auto;
+  padding:22px 22px 26px;
+  animation:slideUp .22s ease;
+}
+@keyframes slideUp{from{transform:translateY(24px);opacity:0.6;}to{transform:none;opacity:1;}}
+@media (min-width:640px){
+  .modal-overlay{align-items:center;}
+  .modal{border-radius:22px;margin-bottom:4vh;}
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.modal-head h3{font-family:var(--ff-display);margin:0;font-size:18px;}
+.modal-close{background:var(--surface-alt);border:none;border-radius:10px;padding:8px;cursor:pointer;color:var(--text-muted);}
+
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--text-muted);margin-bottom:6px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.input, select.input{
+  width:100%;padding:11px 13px;border-radius:11px;border:1px solid var(--border);
+  background:rgba(238,245,240,0.55);font-size:14.5px;color:var(--text);
+}
+.input:focus{background:rgba(255,255,255,0.8);}
+textarea.input{resize:vertical;min-height:60px;}
+
+.type-toggle{display:flex;gap:8px;background:var(--surface-alt);padding:4px;border-radius:12px;}
+.type-toggle button{
+  flex:1;padding:9px 0;border:none;background:transparent;border-radius:9px;
+  font-weight:600;font-size:13.5px;color:var(--text-muted);cursor:pointer;
+}
+.type-toggle button.active.income{background:var(--green-700);color:#fff;}
+.type-toggle button.active.expense{background:var(--red-600);color:#fff;}
+
+.amount-input-wrap{position:relative;}
+.amount-input-wrap .prefix{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;font-weight:600;}
+.amount-input-wrap input{padding-left:40px;font-family:var(--ff-display);font-weight:600;font-size:17px;}
+
+.chip-select{display:flex;flex-wrap:wrap;gap:8px;}
+.chip-select .chip{
+  padding:8px 13px;border-radius:20px;border:1px solid var(--border);
+  font-size:12.5px;font-weight:600;color:var(--text-muted);background:var(--surface);
+  cursor:pointer;
+}
+.chip-select .chip.active{background:var(--green-700);border-color:var(--green-700);color:#fff;}
+
+.transfer-visual{
+  display:flex;align-items:center;gap:10px;justify-content:center;
+  margin:6px 0 18px;padding:16px;background:var(--green-050);border-radius:16px;
+}
+.transfer-node{
+  flex:1;text-align:center;padding:10px;background:var(--surface);border-radius:12px;
+  font-size:12.5px;font-weight:600;color:var(--text);border:1px solid var(--border);
+}
+.transfer-node span{display:block;font-size:10.5px;color:var(--text-muted);font-weight:500;margin-bottom:2px;}
+.transfer-arrow{color:var(--green-700);flex-shrink:0;}
+.transfer-arrow .icon{width:22px;height:22px;}
+
+.modal-actions{display:flex;gap:10px;margin-top:6px;}
+.modal-actions .btn{flex:1;justify-content:center;}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--green-900);color:#fff;padding:12px 20px;border-radius:12px;
+  font-size:13.5px;font-weight:500;box-shadow:var(--shadow-lg);
+  opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  z-index:200;display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast .icon{width:16px;height:16px;color:var(--green-500);}
+
+/* FAB (mobile) */
+.fab{
+  display:none;
+  position:fixed;bottom:82px;right:20px;
+  width:56px;height:56px;border-radius:18px;
+  background:var(--green-700);color:#fff;border:none;
+  align-items:center;justify-content:center;
+  box-shadow:0 10px 24px rgba(20,66,92,0.35);
+  z-index:60;cursor:pointer;
+}
+
+/* Bottom nav (mobile) */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(160%);
+  border-top:1px solid var(--border);
+  padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+  justify-content:space-around;
+  z-index:55;
+}
+.bottom-nav button{
+  background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--text-faint);font-size:10.5px;font-weight:600;padding:4px 8px;cursor:pointer;
+}
+.bottom-nav button.active{color:var(--green-700);}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:960px){
+  .grid-2{grid-template-columns:1fr;}
+}
+
+@media (max-width:768px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main{padding:20px 16px 96px;}
+  .bottom-nav{display:flex;}
+  .fab{display:flex;}
+  .topbar-actions .btn-primary span.label-desktop{display:none;}
+  .hero{padding:22px 20px;}
+}
+
+@media (min-width:769px){
+  .fab{display:none !important;}
+  .bottom-nav{display:none !important;}
+}
+
+/* Small helper */
+.muted{color:var(--text-muted);}
+.section-gap{margin-top:22px;}
+.title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.title-row h2{font-family:var(--ff-display);font-size:18px;margin:0;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">DF</div>
+      <div>
+        <div class="brand-name">Digital Finance</div>
+        <div class="brand-sub">Kelola keuangan pribadi</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item active" data-view="dashboard">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="transactions">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Transaksi
+      </button>
+      <button class="nav-item" data-view="transfer">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        Transfer Bank
+      </button>
+      <button class="nav-item" data-view="accounts">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg>
+        Rekening
+      </button>
+      <button class="nav-item" data-view="reports">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V9M11 19V4M18 19v-7"/></svg>
+        Laporan
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <strong>Data tersimpan lokal</strong>
+      Semua data disimpan di browser perangkat ini, tidak dikirim ke server manapun.
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSub">Ringkasan kondisi keuangan kamu hari ini</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-soft" id="btnOpenTransfer">
+          <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+          <span class="label-desktop">Transfer</span>
+        </button>
+        <button class="btn btn-primary" id="btnOpenTx">
+          <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 5v14M5 12h14"/></svg>
+          <span class="label-desktop">Tambah Transaksi</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="view active" id="view-dashboard">
+      <div class="hero">
+        <div class="hero-label">Total Saldo</div>
+        <div class="hero-amount" id="heroTotal">Rp 0</div>
+        <div class="hero-row">
+          <div class="hero-stat">
+            <span class="dot in"></span>
+            <div>
+              <div class="hero-stat-label">Pemasukan bulan ini</div>
+              <div class="hero-stat-val" id="heroIncome">Rp 0</div>
+            </div>
+          </div>
+          <div class="hero-stat">
+            <span class="dot out"></span>
+            <div>
+              <div class="hero-stat-label">Pengeluaran bulan ini</div>
+              <div class="hero-stat-val" id="heroExpense">Rp 0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">
+            <h3>Arus Kas 6 Bulan Terakhir</h3>
+          </div>
+          <div class="chart-wrap"><canvas id="flowChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title">
+            <h3>Rekening</h3>
+            <button class="muted-link" data-view-link="accounts">Kelola</button>
+          </div>
+          <div id="dashAccounts" style="display:flex;flex-direction:column;gap:10px;"></div>
+        </div>
+      </div>
+
+      <div class="card section-gap">
+        <div class="card-title">
+          <h3>Transaksi Terbaru</h3>
+          <button class="muted-link" data-view-link="transactions">Lihat semua</button>
+        </div>
+        <div class="tx-list" id="dashRecentTx"></div>
+      </div>
+    </section>
+
+    <!-- ===== TRANSAKSI ===== -->
+    <section class="view" id="view-transactions">
+      <div class="filters">
+        <div class="search-wrap">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="fSearch" placeholder="Cari catatan atau kategori...">
+        </div>
+        <select id="fType" class="input" style="width:auto;">
+          <option value="all">Semua Tipe</option>
+          <option value="income">Pemasukan</option>
+          <option value="expense">Pengeluaran</option>
+          <option value="transfer">Transfer</option>
+        </select>
+        <select id="fAccount" class="input" style="width:auto;">
+          <option value="all">Semua Rekening</option>
+        </select>
+        <input type="month" id="fMonth" class="input" style="width:auto;">
+      </div>
+
+      <div class="card">
+        <div class="tx-list" id="fullTxList"></div>
+      </div>
+    </section>
+
+    <!-- ===== TRANSFER ===== -->
+    <section class="view" id="view-transfer">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><h3>Buat Mutasi / Transfer Antar Bank</h3></div>
+          <p class="muted" style="margin-top:-8px;font-size:13px;">Transfer tidak dihitung sebagai pemasukan/pengeluaran, hanya memindahkan saldo antar rekening.</p>
+          <form id="formTransfer" style="margin-top:16px;">
+            <div class="form-group">
+              <label>Dari Rekening</label>
+              <select class="input" id="trFrom" required></select>
+            </div>
+            <div class="form-group">
+              <label>Ke Rekening</label>
+              <select class="input" id="trTo" required></select>
+            </div>
+            <div class="form-group">
+              <label>Jumlah Transfer</label>
+              <div class="amount-input-wrap">
+                <span class="prefix">Rp</span>
+                <input class="input" type="text" inputmode="numeric" id="trAmount" placeholder="0" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tanggal</label>
+                <input class="input" type="date" id="trDate" required>
+              </div>
+              <div class="form-group">
+                <label>Biaya Admin (opsional)</label>
+                <div class="amount-input-wrap">
+                  <span class="prefix">Rp</span>
+                  <input class="input" type="text" inputmode="numeric" id="trFee" placeholder="0">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Catatan (opsional)</label>
+              <input class="input" type="text" id="trNote" placeholder="mis. Transfer dana darurat">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px;">Proses Transfer</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h3>Riwayat Mutasi</h3></div>
+          <div class="tx-list" id="transferHistory"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== REKENING ===== -->
+    <section class="view" id="view-accounts">
+      <div class="title-row">
+        <h2>Rekening &amp; Bank</h2>
+        <button class="btn btn-primary btn-sm" id="btnAddAccount">
+          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>
+          Tambah Rekening
+        </button>
+      </div>
+      <div class="accounts-grid" id="accountsGrid"></div>
+    </section>
+
+    <!-- ===== LAPORAN ===== -->
+    <section class="view" id="view-reports">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title"><h3>Pengeluaran per Kategori (Bulan Ini)</h3></div>
+          <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h3>Ringkasan Bulan Ini</h3></div>
+          <div id="reportSummary" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ BOTTOM NAV (mobile) ============ -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="active" data-view="dashboard">
+    <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
+    Dasbor
+  </button>
+  <button data-view="transactions">
+    <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    Transaksi
+  </button>
+  <button data-view="transfer">
+    <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+    Transfer
+  </button>
+  <button data-view="accounts">
+    <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg>
+    Rekening
+  </button>
+  <button data-view="reports">
+    <svg class="icon" viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M4 19V9M11 19V4M18 19v-7"/></svg>
+    Laporan
+  </button>
+</nav>
+
+<button class="fab" id="fabAdd" aria-label="Tambah transaksi">
+  <svg class="icon" viewBox="0 0 24 24" style="width:24px;height:24px;stroke:#fff"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<!-- ============ MODAL: TRANSAKSI ============ -->
+<div class="modal-overlay" id="modalTx">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="txModalTitle">Tambah Transaksi</h3>
+      <button class="modal-close" data-close="modalTx">
+        <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="formTx">
+      <input type="hidden" id="txId">
+      <div class="form-group">
+        <div class="type-toggle">
+          <button type="button" class="active income" data-type="income">Pemasukan</button>
+          <button type="button" class="expense" data-type="expense">Pengeluaran</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Jumlah</label>
+        <div class="amount-input-wrap">
+          <span class="prefix">Rp</span>
+          <input class="input" type="text" inputmode="numeric" id="txAmount" placeholder="0" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Rekening</label>
+        <select class="input" id="txAccount" required></select>
+      </div>
+      <div class="form-group">
+        <label>Kategori</label>
+        <div class="chip-select" id="txCategoryChips"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tanggal</label>
+          <input class="input" type="date" id="txDate" required>
+        </div>
+        <div class="form-group">
+          <label>Catatan</label>
+          <input class="input" type="text" id="txNote" placeholder="Opsional">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnDeleteTx" style="display:none;">Hapus</button>
+        <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: TRANSFER (quick) ============ -->
+<div class="modal-overlay" id="modalTransfer">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Transfer Antar Bank</h3>
+      <button class="modal-close" data-close="modalTransfer">
+        <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="transfer-visual">
+      <div class="transfer-node" id="tvFrom"><span>Dari</span>—</div>
+      <div class="transfer-arrow">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </div>
+      <div class="transfer-node" id="tvTo"><span>Ke</span>—</div>
+    </div>
+    <p class="muted" style="font-size:13px;margin-top:-8px;">Lengkapi form pada halaman Transfer Bank untuk mengatur detail lengkap.</p>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" data-view-link-close="transfer">Buka Halaman Transfer</button>
+  </div>
+</div>
+
+<!-- ============ MODAL: REKENING ============ -->
+<div class="modal-overlay" id="modalAccount">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="accModalTitle">Tambah Rekening</h3>
+      <button class="modal-close" data-close="modalAccount">
+        <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="formAccount">
+      <input type="hidden" id="accId">
+      <div class="form-group">
+        <label>Nama Rekening</label>
+        <input class="input" type="text" id="accName" placeholder="mis. Tabungan Utama" required>
+      </div>
+      <div class="form-group">
+        <label>Jenis Bank</label>
+        <select class="input" id="accBank" required>
+          <option value="BRI">BRI</option>
+          <option value="Mandiri">Mandiri</option>
+          <option value="SeaBank">SeaBank</option>
+          <option value="Cash">Cash</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Saldo Awal</label>
+        <div class="amount-input-wrap">
+          <span class="prefix">Rp</span>
+          <input class="input" type="text" inputmode="numeric" id="accBalance" placeholder="0" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Warna</label>
+        <div class="chip-select" id="accColorChips"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="btnDeleteAccount" style="display:none;">Hapus</button>
+        <button type="submit" class="btn btn-primary">Simpan Rekening</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg class="icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastMsg">Tersimpan</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== STORAGE ===================== */
+  const STORAGE_KEY = "digital_finance_app_data_v1";
+
+  const CATEGORIES = {
+    income: ["Gaji","Bonus","Investasi","Hadiah","Lainnya"],
+    expense: ["Makanan","Transportasi","Belanja","Tagihan","Hiburan","Kesehatan","Pendidikan","Lainnya"]
+  };
+
+  const ACC_COLORS = ["#1B5C82","#2477A6","#3C93C2","#14425C","#5C7FA6","#B3453B","#C98A2C"];
+
+  function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){ console.warn("Gagal memuat data lokal", e); }
+    // default seed data
+    const accA = uid(), accB = uid();
+    return {
+      accounts:[
+        {id:accA, name:"Tabungan Utama", bank:"BRI", color:ACC_COLORS[0], initialBalance:2500000},
+        {id:accB, name:"Dompet Digital", bank:"SeaBank", color:ACC_COLORS[3], initialBalance:750000}
+      ],
+      transactions:[]
+    };
+  }
+
+  let state = loadState();
+
+  function saveState(){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ console.warn("Gagal menyimpan data lokal", e); }
+  }
+
+  /* ===================== HELPERS ===================== */
+  function formatRupiah(n){
+    const neg = n < 0;
+    const val = Math.abs(Math.round(n));
+    const s = val.toLocaleString('id-ID');
+    return (neg?"-":"") + "Rp " + s;
+  }
+
+  function parseAmountInput(str){
+    if(!str) return 0;
+    const digits = String(str).replace(/[^\d]/g,"");
+    return digits ? parseInt(digits,10) : 0;
+  }
+
+  function attachAmountFormatting(input){
+    input.addEventListener("input", ()=>{
+      const num = parseAmountInput(input.value);
+      input.value = num ? num.toLocaleString('id-ID') : "";
+    });
+  }
+
+  function todayStr(){
+    const d = new Date();
+    return d.toISOString().slice(0,10);
+  }
+
+  function monthStr(dateStr){
+    return dateStr.slice(0,7);
+  }
+
+  function currentMonthKey(){
+    return todayStr().slice(0,7);
+  }
+
+  function formatDateLabel(dateStr){
+    const d = new Date(dateStr+"T00:00:00");
+    return d.toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+  }
+
+  function accountById(id){
+    return state.accounts.find(a=>a.id===id);
+  }
+
+  function accountBalance(accId){
+    const acc = accountById(accId);
+    if(!acc) return 0;
+    let bal = acc.initialBalance || 0;
+    state.transactions.forEach(t=>{
+      if(t.type==="income" && t.accountId===accId) bal += t.amount;
+      if(t.type==="expense" && t.accountId===accId) bal -= t.amount;
+      if(t.type==="transfer"){
+        if(t.fromId===accId) bal -= (t.amount + (t.fee||0));
+        if(t.toId===accId) bal += t.amount;
+      }
+    });
+    return bal;
+  }
+
+  function totalBalance(){
+    return state.accounts.reduce((sum,a)=>sum + accountBalance(a.id), 0);
+  }
+
+  function monthTotals(monthKey){
+    let income=0, expense=0;
+    state.transactions.forEach(t=>{
+      if(monthStr(t.date)!==monthKey) return;
+      if(t.type==="income") income += t.amount;
+      if(t.type==="expense") expense += t.amount;
+    });
+    return {income, expense};
+  }
+
+  function showToast(msg){
+    const toast = document.getElementById("toast");
+    document.getElementById("toastMsg").textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=>toast.classList.remove("show"), 2200);
+  }
+
+  /* ===================== NAVIGATION ===================== */
+  const viewTitles = {
+    dashboard:{title:"Dashboard", sub:"Ringkasan kondisi keuangan kamu hari ini"},
+    transactions:{title:"Transaksi", sub:"Semua catatan pemasukan dan pengeluaran"},
+    transfer:{title:"Transfer Bank", sub:"Pindahkan saldo antar rekening dengan mudah"},
+    accounts:{title:"Rekening", sub:"Kelola daftar bank dan dompet digital kamu"},
+    reports:{title:"Laporan", sub:"Analisis pengeluaran berdasarkan kategori"}
+  };
+
+  function switchView(name){
+    document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+    document.getElementById("view-"+name).classList.add("active");
+
+    document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
+    document.querySelectorAll("#bottomNav button").forEach(b=>b.classList.toggle("active", b.dataset.view===name));
+
+    document.getElementById("pageTitle").textContent = viewTitles[name].title;
+    document.getElementById("pageSub").textContent = viewTitles[name].sub;
+
+    if(name==="dashboard") renderDashboard();
+    if(name==="transactions") renderTransactionsView();
+    if(name==="transfer") renderTransferView();
+    if(name==="accounts") renderAccountsView();
+    if(name==="reports") renderReportsView();
+
+    window.scrollTo({top:0, behavior:"instant" in window ? "instant":"auto"});
+  }
+
+  document.querySelectorAll(".nav-item, #bottomNav button").forEach(btn=>{
+    btn.addEventListener("click", ()=>switchView(btn.dataset.view));
+  });
+  document.querySelectorAll("[data-view-link]").forEach(btn=>{
+    btn.addEventListener("click", ()=>switchView(btn.dataset.viewLink));
+  });
+
+  /* ===================== MODALS ===================== */
+  function openModal(id){ document.getElementById(id).classList.add("active"); }
+  function closeModal(id){ document.getElementById(id).classList.remove("active"); }
+
+  document.querySelectorAll("[data-close]").forEach(btn=>{
+    btn.addEventListener("click", ()=>closeModal(btn.dataset.close));
+  });
+  document.querySelectorAll(".modal-overlay").forEach(ov=>{
+    ov.addEventListener("click", (e)=>{ if(e.target===ov) ov.classList.remove("active"); });
+  });
+  document.querySelectorAll("[data-view-link-close]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      closeModal("modalTransfer");
+      switchView(btn.dataset.viewLinkClose);
+    });
+  });
+
+  /* ===================== RENDER: ACCOUNT SELECTS ===================== */
+  function populateAccountSelects(){
+    const selects = [document.getElementById("txAccount"), document.getElementById("trFrom"),
+                      document.getElementById("trTo"), document.getElementById("fAccount")];
+    selects.forEach(sel=>{
+      const isFilter = sel.id === "fAccount";
+      const keepFirst = isFilter;
+      sel.innerHTML = isFilter ? '<option value="all">Semua Rekening</option>' : "";
+      state.accounts.forEach(a=>{
+        const opt = document.createElement("option");
+        opt.value = a.id;
+        opt.textContent = `${a.name} — ${a.bank}`;
+        sel.appendChild(opt);
+      });
+    });
+  }
+
+  /* ===================== TX ICON HELPERS ===================== */
+  function txIconSvg(type){
+    if(type==="income") return '<svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+    if(type==="expense") return '<svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M12 5v14M5 12l7 7 7-7"/></svg>';
+    return '<svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>';
+  }
+
+  function buildTxRow(t, opts){
+    opts = opts || {};
+    const row = document.createElement("div");
+    row.className = "tx-row";
+
+    let title, sub, amountLabel, amountClass;
+    if(t.type==="transfer"){
+      const from = accountById(t.fromId), to = accountById(t.toId);
+      title = `${from?from.name:"?"} → ${to?to.name:"?"}`;
+      sub = (t.note ? t.note+" · " : "") + formatDateLabel(t.date);
+      amountLabel = formatRupiah(t.amount);
+      amountClass = "";
+    } else {
+      const acc = accountById(t.accountId);
+      title = t.category || (t.type==="income"?"Pemasukan":"Pengeluaran");
+      sub = (acc?acc.name+" · ":"") + formatDateLabel(t.date) + (t.note?" · "+t.note:"");
+      amountLabel = (t.type==="income"?"+":"−") + formatRupiah(t.amount).replace("Rp ","Rp ");
+      amountClass = t.type==="income" ? "pos":"neg";
+    }
+
+    row.innerHTML = `
+      <div class="tx-ico ${t.type}">${txIconSvg(t.type)}</div>
+      <div class="tx-mid">
+        <div class="tx-title">${title}</div>
+        <div class="tx-sub">${sub}</div>
+      </div>
+      <div class="tx-amt ${amountClass}">${amountLabel}</div>
+    `;
+
+    if(!opts.readonly){
+      const actions = document.createElement("div");
+      actions.className = "tx-actions";
+      actions.innerHTML = `
+        <button title="Edit" data-edit>
+          <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button title="Hapus" data-del>
+          <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>
+        </button>`;
+      actions.querySelector("[data-edit]").addEventListener("click", ()=>{
+        if(t.type==="transfer") return; // transfers not editable inline for simplicity
+        openTxModal(t);
+      });
+      actions.querySelector("[data-del]").addEventListener("click", ()=>{
+        if(confirm("Hapus transaksi ini?")){
+          state.transactions = state.transactions.filter(x=>x.id!==t.id);
+          saveState();
+          refreshCurrentView();
+          showToast("Transaksi dihapus");
+        }
+      });
+      row.appendChild(actions);
+    }
+    return row;
+  }
+
+  /* ===================== DASHBOARD ===================== */
+  let flowChartInstance = null;
+  let categoryChartInstance = null;
+
+  function renderDashboard(){
+    document.getElementById("heroTotal").textContent = formatRupiah(totalBalance());
+    const mt = monthTotals(currentMonthKey());
+    document.getElementById("heroIncome").textContent = formatRupiah(mt.income);
+    document.getElementById("heroExpense").textContent = formatRupiah(mt.expense);
+
+    // account mini list
+    const wrap = document.getElementById("dashAccounts");
+    wrap.innerHTML = "";
+    if(state.accounts.length===0){
+      wrap.innerHTML = `<div class="empty" style="padding:20px 0;"><p>Belum ada rekening. Tambahkan dulu di menu Rekening.</p></div>`;
+    } else {
+      state.accounts.forEach(a=>{
+        const bal = accountBalance(a.id);
+        const el = document.createElement("div");
+        el.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:var(--surface-alt);border-radius:12px;";
+        el.innerHTML = `
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <div style="width:30px;height:30px;border-radius:8px;background:${a.color};flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--ff-display);font-weight:700;font-size:12px;">${a.bank.slice(0,2).toUpperCase()}</div>
+            <div style="min-width:0;">
+              <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.name}</div>
+              <div style="font-size:11.5px;color:var(--text-muted);">${a.bank}</div>
+            </div>
+          </div>
+          <div style="font-family:var(--ff-display);font-weight:700;font-size:13.5px;${bal<0?'color:var(--red-600);':''}">${formatRupiah(bal)}</div>
+        `;
+        wrap.appendChild(el);
+      });
+    }
+
+    // recent tx
+    const recentWrap = document.getElementById("dashRecentTx");
+    recentWrap.innerHTML = "";
+    const recent = [...state.transactions].sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id)).slice(0,6);
+    if(recent.length===0){
+      recentWrap.innerHTML = `<div class="empty">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        <h4>Belum ada transaksi</h4>
+        <p>Mulai catat transaksi pertama kamu.</p>
+      </div>`;
+    } else {
+      recent.forEach(t=>recentWrap.appendChild(buildTxRow(t)));
+    }
+
+    renderFlowChart();
+  }
+
+  function renderFlowChart(){
+    const ctx = document.getElementById("flowChart");
+    const months = [];
+    const now = new Date();
+    for(let i=5;i>=0;i--){
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      months.push(d.toISOString().slice(0,7));
+    }
+    const incomeData = months.map(m=>monthTotals(m).income);
+    const expenseData = months.map(m=>monthTotals(m).expense);
+    const labels = months.map(m=>{
+      const [y,mo] = m.split("-");
+      return new Date(y, mo-1, 1).toLocaleDateString('id-ID',{month:'short'});
+    });
+
+    if(flowChartInstance) flowChartInstance.destroy();
+    flowChartInstance = new Chart(ctx, {
+      type:'bar',
+      data:{
+        labels,
+        datasets:[
+          {label:'Pemasukan', data:incomeData, backgroundColor:'#2477A6', borderRadius:6, maxBarThickness:22},
+          {label:'Pengeluaran', data:expenseData, backgroundColor:'#E3A39C', borderRadius:6, maxBarThickness:22}
+        ]
+      },
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, font:{size:11} } } },
+        scales:{
+          y:{ ticks:{ callback:(v)=> (v>=1000000? (v/1000000)+'jt' : v>=1000? (v/1000)+'rb' : v), font:{size:10} }, grid:{color:'#EEF3EF'} },
+          x:{ grid:{display:false}, ticks:{font:{size:11}} }
+        }
+      }
+    });
+  }
+
+  /* ===================== TRANSACTIONS VIEW ===================== */
+  function renderTransactionsView(){
+    populateAccountSelects();
+    applyTxFilters();
+  }
+
+  function applyTxFilters(){
+    const search = document.getElementById("fSearch").value.toLowerCase().trim();
+    const type = document.getElementById("fType").value;
+    const accId = document.getElementById("fAccount").value;
+    const month = document.getElementById("fMonth").value;
+
+    let list = [...state.transactions];
+    if(type!=="all") list = list.filter(t=>t.type===type);
+    if(accId!=="all") list = list.filter(t=> t.accountId===accId || t.fromId===accId || t.toId===accId);
+    if(month) list = list.filter(t=> monthStr(t.date)===month);
+    if(search){
+      list = list.filter(t=>{
+        const hay = [(t.category||""), (t.note||"")].join(" ").toLowerCase();
+        return hay.includes(search);
+      });
+    }
+    list.sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id));
+
+    const wrap = document.getElementById("fullTxList");
+    wrap.innerHTML = "";
+    if(list.length===0){
+      wrap.innerHTML = `<div class="empty">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <h4>Tidak ada transaksi</h4>
+        <p>Coba ubah filter atau tambahkan transaksi baru.</p>
+      </div>`;
+    } else {
+      list.forEach(t=>wrap.appendChild(buildTxRow(t)));
+    }
+  }
+
+  ["fSearch","fType","fAccount","fMonth"].forEach(id=>{
+    document.getElementById(id).addEventListener("input", applyTxFilters);
+    document.getElementById(id).addEventListener("change", applyTxFilters);
+  });
+
+  /* ===================== TRANSFER VIEW ===================== */
+  function renderTransferView(){
+    populateAccountSelects();
+    document.getElementById("trDate").value = todayStr();
+
+    const wrap = document.getElementById("transferHistory");
+    wrap.innerHTML = "";
+    const transfers = state.transactions.filter(t=>t.type==="transfer")
+      .sort((a,b)=> (b.date+b.id).localeCompare(a.date+a.id));
+    if(transfers.length===0){
+      wrap.innerHTML = `<div class="empty">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        <h4>Belum ada mutasi</h4>
+        <p>Transfer antar rekening akan muncul di sini.</p>
+      </div>`;
+    } else {
+      transfers.forEach(t=>wrap.appendChild(buildTxRow(t, {readonly:true})));
+    }
+  }
+
+  const formTransfer = document.getElementById("formTransfer");
+  attachAmountFormatting(document.getElementById("trAmount"));
+  attachAmountFormatting(document.getElementById("trFee"));
+
+  formTransfer.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const fromId = document.getElementById("trFrom").value;
+    const toId = document.getElementById("trTo").value;
+    const amount = parseAmountInput(document.getElementById("trAmount").value);
+    const fee = parseAmountInput(document.getElementById("trFee").value);
+    const date = document.getElementById("trDate").value || todayStr();
+    const note = document.getElementById("trNote").value.trim();
+
+    if(fromId===toId){ showToast("Rekening asal dan tujuan harus berbeda"); return; }
+    if(amount<=0){ showToast("Jumlah transfer tidak valid"); return; }
+
+    state.transactions.push({
+      id:uid(), type:"transfer", fromId, toId, amount, fee, date, note
+    });
+    saveState();
+    formTransfer.reset();
+    document.getElementById("trDate").value = todayStr();
+    renderTransferView();
+    showToast("Transfer berhasil dicatat");
+  });
+
+  /* ===================== ACCOUNTS VIEW ===================== */
+  function renderAccountsView(){
+    const grid = document.getElementById("accountsGrid");
+    grid.innerHTML = "";
+    if(state.accounts.length===0){
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/></svg>
+        <h4>Belum ada rekening</h4>
+        <p>Tambahkan rekening bank atau dompet digital pertama kamu.</p>
+      </div>`;
+      return;
+    }
+    state.accounts.forEach(a=>{
+      const bal = accountBalance(a.id);
+      const card = document.createElement("div");
+      card.className = "acc-card";
+      card.innerHTML = `
+        <div class="acc-chip" style="background:${a.color}">${a.bank.slice(0,2).toUpperCase()}</div>
+        <div class="acc-name">${a.name}</div>
+        <div class="acc-bank">${a.bank}</div>
+        <div class="acc-balance ${bal<0?'neg':''}">${formatRupiah(bal)}</div>
+      `;
+      card.addEventListener("click", ()=>openAccountModal(a));
+      grid.appendChild(card);
+    });
+  }
+
+  document.getElementById("btnAddAccount").addEventListener("click", ()=>openAccountModal(null));
+
+  function buildColorChips(selected){
+    const wrap = document.getElementById("accColorChips");
+    wrap.innerHTML = "";
+    ACC_COLORS.forEach(c=>{
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.style.cssText = `width:30px;height:30px;border-radius:50%;background:${c};border:2px solid ${c===selected?'#16241D':'transparent'};box-shadow:0 0 0 2px #fff inset;cursor:pointer;`;
+      chip.dataset.color = c;
+      chip.addEventListener("click", ()=>{
+        wrap.querySelectorAll("button").forEach(b=>b.style.border="2px solid transparent");
+        chip.style.border = "2px solid #16241D";
+        wrap.dataset.selected = c;
+      });
+      wrap.appendChild(chip);
+    });
+    wrap.dataset.selected = selected;
+  }
+
+  function openAccountModal(acc){
+    document.getElementById("accModalTitle").textContent = acc ? "Edit Rekening" : "Tambah Rekening";
+    document.getElementById("accId").value = acc ? acc.id : "";
+    document.getElementById("accName").value = acc ? acc.name : "";
+    document.getElementById("accBank").value = acc ? acc.bank : "";
+    document.getElementById("accBalance").value = acc ? acc.initialBalance.toLocaleString('id-ID') : "";
+    buildColorChips(acc ? acc.color : ACC_COLORS[0]);
+    document.getElementById("btnDeleteAccount").style.display = acc ? "inline-flex" : "none";
+    openModal("modalAccount");
+  }
+
+  attachAmountFormatting(document.getElementById("accBalance"));
+
+  document.getElementById("formAccount").addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const id = document.getElementById("accId").value;
+    const name = document.getElementById("accName").value.trim();
+    const bank = document.getElementById("accBank").value.trim();
+    const initialBalance = parseAmountInput(document.getElementById("accBalance").value);
+    const color = document.getElementById("accColorChips").dataset.selected || ACC_COLORS[0];
+
+    if(!name || !bank){ showToast("Lengkapi data rekening"); return; }
+
+    if(id){
+      const acc = accountById(id);
+      acc.name = name; acc.bank = bank; acc.initialBalance = initialBalance; acc.color = color;
+    } else {
+      state.accounts.push({id:uid(), name, bank, initialBalance, color});
+    }
+    saveState();
+    closeModal("modalAccount");
+    renderAccountsView();
+    populateAccountSelects();
+    showToast("Rekening tersimpan");
+  });
+
+  document.getElementById("btnDeleteAccount").addEventListener("click", ()=>{
+    const id = document.getElementById("accId").value;
+    if(!id) return;
+    const used = state.transactions.some(t=> t.accountId===id || t.fromId===id || t.toId===id);
+    if(used){
+      showToast("Rekening memiliki transaksi, hapus transaksi terkait dulu");
+      return;
+    }
+    if(confirm("Hapus rekening ini?")){
+      state.accounts = state.accounts.filter(a=>a.id!==id);
+      saveState();
+      closeModal("modalAccount");
+      renderAccountsView();
+      populateAccountSelects();
+      showToast("Rekening dihapus");
+    }
+  });
+
+  /* ===================== REPORTS VIEW ===================== */
+  function renderReportsView(){
+    const monthKey = currentMonthKey();
+    const catTotals = {};
+    state.transactions.forEach(t=>{
+      if(t.type!=="expense") return;
+      if(monthStr(t.date)!==monthKey) return;
+      catTotals[t.category] = (catTotals[t.category]||0) + t.amount;
+    });
+    const labels = Object.keys(catTotals);
+    const data = Object.values(catTotals);
+    const palette = ["#1B5C82","#3C93C2","#9CC6DE","#C98A2C","#B3453B","#14425C","#5C7FA6","#5F7268"];
+
+    const ctx = document.getElementById("categoryChart");
+    if(categoryChartInstance) categoryChartInstance.destroy();
+    if(labels.length===0){
+      ctx.getContext('2d').clearRect(0,0,ctx.width,ctx.height);
+    } else {
+      categoryChartInstance = new Chart(ctx, {
+        type:'doughnut',
+        data:{ labels, datasets:[{ data, backgroundColor:palette, borderWidth:2, borderColor:'#fff' }] },
+        options:{
+          responsive:true, maintainAspectRatio:false, cutout:'62%',
+          plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, usePointStyle:true, font:{size:11} } } }
+        }
+      });
+    }
+
+    const mt = monthTotals(monthKey);
+    const net = mt.income - mt.expense;
+    const summary = document.getElementById("reportSummary");
+    summary.innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:12px 14px;background:var(--green-050);border-radius:12px;">
+        <span class="muted" style="font-size:13px;">Total Pemasukan</span>
+        <strong style="font-family:var(--ff-display);color:var(--green-700);">${formatRupiah(mt.income)}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px 14px;background:var(--red-100);border-radius:12px;">
+        <span class="muted" style="font-size:13px;">Total Pengeluaran</span>
+        <strong style="font-family:var(--ff-display);color:var(--red-600);">${formatRupiah(mt.expense)}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px 14px;background:var(--surface-alt);border-radius:12px;">
+        <span class="muted" style="font-size:13px;">Arus Kas Bersih</span>
+        <strong style="font-family:var(--ff-display);${net<0?'color:var(--red-600);':'color:var(--green-700);'}">${formatRupiah(net)}</strong>
+      </div>
+      ${labels.length ? labels.map((l,i)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 2px;border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;font-size:13px;">
+            <span style="width:9px;height:9px;border-radius:50%;background:${palette[i%palette.length]};"></span>
+            ${l}
+          </div>
+          <span style="font-size:13px;font-weight:600;">${formatRupiah(data[i])}</span>
+        </div>`).join("") : '<p class="muted" style="font-size:13px;">Belum ada pengeluaran bulan ini.</p>'}
+    `;
+  }
+
+  /* ===================== TX MODAL ===================== */
+  let currentTxType = "income";
+
+  function buildCategoryChips(type, selected){
+    const wrap = document.getElementById("txCategoryChips");
+    wrap.innerHTML = "";
+    CATEGORIES[type].forEach(cat=>{
+      const chip = document.createElement("button");
+      chip.type="button";
+      chip.className = "chip" + (cat===selected ? " active" : "");
+      chip.textContent = cat;
+      chip.addEventListener("click", ()=>{
+        wrap.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+        chip.classList.add("active");
+        wrap.dataset.selected = cat;
+      });
+      wrap.appendChild(chip);
+    });
+    wrap.dataset.selected = selected || CATEGORIES[type][0];
+    if(!selected){
+      wrap.querySelector(".chip").classList.add("active");
+    }
+  }
+
+  function setTxType(type){
+    currentTxType = type;
+    document.querySelectorAll(".type-toggle button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.type===type);
+    });
+    buildCategoryChips(type);
+  }
+
+  document.querySelectorAll(".type-toggle button").forEach(btn=>{
+    btn.addEventListener("click", ()=>setTxType(btn.dataset.type));
+  });
+
+  function openTxModal(t){
+    populateAccountSelects();
+    document.getElementById("txModalTitle").textContent = t ? "Edit Transaksi" : "Tambah Transaksi";
+    document.getElementById("txId").value = t ? t.id : "";
+    document.getElementById("txAmount").value = t ? t.amount.toLocaleString('id-ID') : "";
+    document.getElementById("txDate").value = t ? t.date : todayStr();
+    document.getElementById("txNote").value = t ? (t.note||"") : "";
+    if(t && t.accountId) document.getElementById("txAccount").value = t.accountId;
+
+    setTxType(t ? t.type : "income");
+    if(t) buildCategoryChips(t.type, t.category);
+
+    document.getElementById("btnDeleteTx").style.display = t ? "inline-flex" : "none";
+    openModal("modalTx");
+  }
+
+  document.getElementById("btnOpenTx").addEventListener("click", ()=>openTxModal(null));
+  document.getElementById("fabAdd").addEventListener("click", ()=>openTxModal(null));
+  document.getElementById("btnOpenTransfer").addEventListener("click", ()=>{
+    document.getElementById("tvFrom").innerHTML = "<span>Dari</span>Pilih rekening di form Transfer";
+    document.getElementById("tvTo").innerHTML = "<span>Ke</span>Pilih rekening di form Transfer";
+    openModal("modalTransfer");
+  });
+
+  attachAmountFormatting(document.getElementById("txAmount"));
+
+  document.getElementById("formTx").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const id = document.getElementById("txId").value;
+    const amount = parseAmountInput(document.getElementById("txAmount").value);
+    const accountId = document.getElementById("txAccount").value;
+    const category = document.getElementById("txCategoryChips").dataset.selected;
+    const date = document.getElementById("txDate").value || todayStr();
+    const note = document.getElementById("txNote").value.trim();
+
+    if(amount<=0){ showToast("Jumlah tidak valid"); return; }
+    if(!accountId){ showToast("Pilih rekening terlebih dahulu"); return; }
+
+    if(id){
+      const t = state.transactions.find(x=>x.id===id);
+      Object.assign(t, {type:currentTxType, amount, accountId, category, date, note});
+    } else {
+      state.transactions.push({id:uid(), type:currentTxType, amount, accountId, category, date, note});
+    }
+    saveState();
+    closeModal("modalTx");
+    refreshCurrentView();
+    showToast("Transaksi tersimpan");
+  });
+
+  document.getElementById("btnDeleteTx").addEventListener("click", ()=>{
+    const id = document.getElementById("txId").value;
+    if(!id) return;
+    if(confirm("Hapus transaksi ini?")){
+      state.transactions = state.transactions.filter(x=>x.id!==id);
+      saveState();
+      closeModal("modalTx");
+      refreshCurrentView();
+      showToast("Transaksi dihapus");
+    }
+  });
+
+  /* ===================== UTIL ===================== */
+  function activeViewName(){
+    const active = document.querySelector(".view.active");
+    return active ? active.id.replace("view-","") : "dashboard";
+  }
+  function refreshCurrentView(){
+    switchView(activeViewName());
+  }
+
+  /* ===================== INIT ===================== */
+  populateAccountSelects();
+  renderDashboard();
+})();
+</script>
+</body>
+</html>
