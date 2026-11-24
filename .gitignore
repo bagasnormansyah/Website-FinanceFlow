@@ -37,6 +37,9 @@ yarn-error.log*
 # downloaded archive / unrelated extracted folder
 /web-keuangan-main/
 
+# local documents
+*.pdf
+
 # vercel
 .vercel
 
