@@ -49,8 +49,14 @@ Next.js 16 (App Router), TypeScript, Tailwind CSS 4, shadcn/ui (preset Nova + Ra
 5. Konfigurasi Supabase Auth:
 
    - Aktifkan provider Email di Authentication → Providers.
-   - Tambahkan `http://localhost:3000/auth/callback` pada Authentication → URL Configuration → Redirect URLs.
-   - Untuk produksi, ganti localhost dengan domain deployment Anda.
+   - Authentication → URL Configuration → **Site URL** diisi domain utama aplikasi, bukan localhost.
+   - Authentication → URL Configuration → **Redirect URLs** ditambahkan:
+     ```text
+     http://localhost:3000/auth/callback
+     https://DOMAIN_ANDA/auth/callback
+     ```
+   - Aplikasi mengirim `emailRedirectTo` otomatis berdasarkan host request, tetapi Supabase tetap menolak redirect ke URL yang belum terdaftar di daftar tersebut.
+   - Jika email verifikasi masih mengarah ke `localhost`, perbarui **Site URL** dan **Redirect URLs**, lalu kirim ulang email/daftar ulang akun.
 
 6. Jalankan aplikasi:
 
@@ -88,6 +94,12 @@ npm run start   # production server
 npm run lint    # ESLint
 ```
 
+## Deployment
+
+Saat deploy (mis. Vercel), isi environment variable yang sama seperti `.env.local`. `NEXT_PUBLIC_APP_URL` sebaiknya diisi URL produksi, meskipun aplikasi juga mendeteksi origin dari header request.
+
+Setelah deploy, jangan lupa memperbarui **Site URL** dan **Redirect URLs** di Supabase seperti di atas. Jika tidak, email verifikasi akan tetap mengarah ke `http://localhost:3000`.
+
 ## Status verifikasi
 
-Build produksi dan lint sudah diuji dengan environment dummy. Koneksi CRUD/realtime langsung belum dapat diuji karena kredensial Supabase belum diisi. Isi `.env.local` dan jalankan migration terlebih dahulu sebelum menguji fitur secara end-to-end.
+Build produksi dan lint lolos. Koneksi Supabase sudah diuji secara langsung: register, login, dan pembuatan transaksi berhasil. Realtime dan cron berulang memerlukan konfigurasi tambahan (`SUPABASE_SERVICE_ROLE_KEY` untuk cron).

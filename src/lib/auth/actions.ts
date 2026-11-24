@@ -1,11 +1,24 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { loginSchema, registerSchema } from "@/lib/validations";
 import type { ActionResult } from "@/lib/types";
 
 function flatten(error: { flatten: () => { fieldErrors: Record<string, string[]> } }) {
   return error.flatten().fieldErrors;
+}
+
+async function getAppOrigin() {
+  const requestHeaders = await headers();
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const proto =
+    requestHeaders.get("x-forwarded-proto")?.split(",")[0] ??
+    (host?.includes("localhost") ? "http" : "https");
+
+  if (host) return `${proto}://${host}`;
+  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 }
 
 export async function signIn(input: { email: string; password: string }): Promise<ActionResult> {
@@ -39,6 +52,9 @@ export async function signUp(
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.fullName },
+      // Link verifikasi harus kembali ke domain tempat request register dibuat,
+      // bukan localhost dari dashboard Supabase.
+      emailRedirectTo: `${await getAppOrigin()}/auth/callback?next=/dashboard`,
     },
   });
 
