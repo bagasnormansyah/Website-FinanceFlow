@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
-import { useState } from "react";
+import { useSyncExternalStore, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowDownLeft,
@@ -41,6 +41,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+
+const subscribeToNothing = () => () => {};
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -99,14 +101,25 @@ function SidebarBrand() {
 export function AppShell({
   children,
   email,
+  year,
 }: {
   children: React.ReactNode;
   email: string;
+  year: number;
 }) {
   const router = useRouter();
   const { resolvedTheme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const initials = email.slice(0, 2).toUpperCase();
+
+  // next-themes hanya mengetahui tema setelah hydration. `useSyncExternalStore`
+  // memakai snapshot server saat hydration, lalu snapshot client setelahnya,
+  // sehingga ikon yang dirender tidak menyebabkan hydration mismatch.
+  const mounted = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false,
+  );
 
   async function handleSignOut() {
     const result = await signOut();
@@ -125,7 +138,7 @@ export function AppShell({
         <SidebarBrand />
         <SidebarNav />
         <div className="border-t border-sidebar-border p-4 text-xs text-sidebar-foreground/50">
-          © {new Date().getFullYear()} FinanceFlow
+          © {year} FinanceFlow
         </div>
       </aside>
 
@@ -161,7 +174,7 @@ export function AppShell({
             onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
             aria-label="Ganti tema"
           >
-            {resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+            {mounted && resolvedTheme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
           </Button>
 
           <DropdownMenu>

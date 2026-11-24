@@ -12,9 +12,12 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await requireUser();
+  // Dihitung di server setelah session dibaca (request time), bukan di client
+  // saat static shell diprerender — menghindari error Date.now() di Cache Components.
+  const year = new Date().getFullYear();
 
   return (
-    <AppShell email={user.email ?? "Pengguna"}>
+    <AppShell email={user.email ?? "Pengguna"} year={year}>
       <RealtimeRefresh userId={user.id} />
       {children}
     </AppShell>
