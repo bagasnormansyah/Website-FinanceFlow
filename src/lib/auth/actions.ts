@@ -59,8 +59,14 @@ export async function signUp(
   });
 
   if (error) {
-    console.error("signUp:", error.message);
-    return { success: false, message: error.message };
+    console.error("signUp:", error.code, error.message);
+    const message =
+      error.code === "over_email_send_rate_limit"
+        ? "Terlalu banyak email verifikasi dikirim. Silakan coba lagi beberapa saat."
+        : error.code === "email_address_not_authorized"
+          ? "Email ini belum diizinkan menerima email verifikasi. Hubungi administrator."
+          : error.message;
+    return { success: false, message };
   }
 
   if (!data.session) {
